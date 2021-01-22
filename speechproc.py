@@ -53,18 +53,18 @@ def enframe(speech, fs, winlen, ovrlen):
      idx = numpy.array(idx,dtype=numpy.int64)
     
  
-     return signal[idx]
+     return signal[idx],signal
 
 
 def sflux(data, fs, winlen, ovrlen, nftt):
     
     eps=numpy.finfo(float).eps
 
-    xf=enframe(data, fs, winlen, ovrlen) #framing
+    _xf, signal=enframe(data, fs, winlen, ovrlen) #framing
     w = numpy.matrix(numpy.hamming(int(fs*winlen)) )
-    w = numpy.tile(w,(numpy.size(xf, axis=0), 1))
+    w = numpy.tile(w,(numpy.size(_xf, axis=0), 1))
 
-    xf = numpy.multiply (xf, w) #apply window
+    xf = numpy.multiply (_xf, w) #apply window
     #fft
     ak=numpy.abs(numpy.fft.fft(xf,nftt))
     idx = range(0,int(nftt/2) +1)
@@ -86,7 +86,7 @@ def sflux(data, fs, winlen, ovrlen, nftt):
 
 
     
-    return ft, flen, fsh10, nfr10
+    return ft, flen, fsh10, nfr10,_xf, signal
 
 
 def snre_highenergy(fdata, nfr10, flen, fsh10, ENERGYFLOOR, pv01, pvblk):
